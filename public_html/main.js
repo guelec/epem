@@ -2,6 +2,7 @@ import {OBJLoader} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader
 import {MTLLoader} from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
 import {DDSLoader} from './resources/threejs/r122/examples/jsm/loaders/DDSLoader.js';
 import {FBXLoader} from './resources/threejs/r122/examples/jsm/loaders/FBXLoader.js';
+import {TransformControls} from './resources/threejs/r122/examples/jsm/controls/TransformControls.js';
 import {DragControls} from './resources/threejs/r122/examples/jsm/controls/DragControls.js';
 
 var container, scene, camera, renderer;
@@ -19,7 +20,10 @@ var collected = [];
 var player = new THREE.Object3D();
 var solar_panel = new THREE.Object3D();
 var wind_mill = new THREE.Object3D();
-
+var natural_gas = new THREE.Object3D();
+var hydro = new THREE.Object3D();
+var coal = new THREE.Object3D();
+var biomass = new THREE.Object3D();
 
 const mouse = new THREE.Vector2(), raycaster = new THREE.Raycaster();
 var control_target = player;
@@ -76,42 +80,8 @@ function init() {
         scene.add(light.target);
     }
 
-    //
-    // Add Objects To the Scene HERE
-
-    /*
-     const mtlLoader = new MTLLoader();
-     // adding player to scene
-     mtlLoader.load('objects/player/player.mtl', function (materials) {
-     materials.preload();
-     const objLoaderExample = new OBJLoader();
-     objLoaderExample.setMaterials(materials);
-     objLoaderExample.load('objects/player/player.obj', (root) => {
-     root.rotation.y = Math.PI * -1;
-     player.scale.set(0.009, 0.009, 0.009);
-     player.add(root);
-     //scene.add(root);
-     });
-     });
-     */
-
-    /*
-     objectLoader('obj/trash/bottle1.mtl', 'obj/trash/bottle1.obj', 0, 5, 0, true);
-     objectLoader('obj/trash/bottle2.mtl', 'obj/trash/bottle2.obj', -5, 5, 0, true);
-     objectLoader('obj/trash/bottle3.mtl', 'obj/trash/bottle3.obj', -10, 5, 0, true);
-     
-     objectLoader('obj/trash/trash_bag.mtl', 'obj/trash/trash_bag.obj', 0, 10, 0, true);
-     objectLoader('obj/trash/trash_can.mtl', 'obj/trash/trash_can.obj', -5, 10, 0, true);
-     objectLoader('obj/trash/trash_can_wlid.mtl', 'obj/trash/trash_can_wlid.obj', -10, 10, 0, true);
-     
-     objectLoader('obj/trash/trash_dumpster.mtl', 'obj/trash/trash_dumpster.obj', 0, 15, 0, );
-     objectLoader('obj/trash/trash_dumpster_open.mtl', 'obj/trash/trash_dumpster_open.obj', -5, 15, 0);
-     objectLoader('obj/character/character.mtl', 'obj/character/character.obj', -10, 15, 0, true);
-     
-     objectLoader('obj/vehicle/truck.mtl', 'obj/vehicle/truck.obj', -20, 15, 0, true);
-     */
     /////////////
-    
+
     resourceLoader();
 
     /////////////
@@ -126,6 +96,8 @@ function init() {
     player.position.x = 0;
     //player.rotation.y += Math.PI * 0.5;
     scene.add(player);
+    
+    
 
     controls = new THREE.PlayerControls(camera, control_target, collidableObjects, raycaster);
     controls.init();
@@ -323,73 +295,23 @@ function onClick(event) {
 
 function resourceLoader()
 {
-    loadObjWithTexture('objects/solar_panel/solar_panel.obj','objects/solar_panel/solar_panel.jpg' );
-    loadFbxWithTexture('objects/wind_mill/wind_mill.fbx','objects/solar_panel/solar_panel.jpg' );
-    
+    loadObjWithTexture('objects/solar_panel/solar_panel.obj', 'objects/solar_panel/solar_panel.jpg'
+            , 0, 0.5, 0, 0.005, 0.005, 0.005);
+    loadObjWithTexture('objects/biomass/biomass.obj', 'objects/biomass/biomass.jpg'
+            , 0, 0, 0, 0.005, 0.001, 0.005);
+    loadObjWithMtl('objects/hydro/hydro.obj', 'objects/hydro/hydro.mtl'
+            , 5, 0, 0, 0.005, 0.005, 0.005);
+    loadObjWithTexture('objects/natural_gas/natural_gas.obj', 'objects/natural_gas/natural_gas.png'
+            , 10, 0.25, 0, 0.5, 0.5, 0.5);
+    loadObjWithTexture('objects/coal/coal.obj', 'objects/coal/coal.jpg'
+            , 0, 0, 0, 0.2, 0.2, 0.2);
+    loadFbxWithTexture('objects/wind_mill/wind_mill.fbx', 'objects/solar_panel/solar_panel.jpg'
+            , 0, 2, 0, 0.001, 0.001, 0.001);
+
     const fbxLoader = new FBXLoader();
     const objLoader = new OBJLoader();
 
-    /*
-    // LOAD WIND MILL
-    fbxLoader.load('objects/wind_mill/wind_mill.fbx', function (object) {
-        object.traverse(function (child) {
-            if (child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-            }
-        });
-        object.scale.set(0.001, 0.001, 0.001);
-        object.position.set(0, 2, 0);
-        scene.add(object);
-    });
-*/
 
-
-/*
-    // LOAD SOLAR PANEL
-    var map = textureLoader.load('objects/solar_panel/solar_panel.jpg');
-    var material = new THREE.MeshPhongMaterial({map: map});
-
-    objLoader.load('objects/solar_panel/solar_panel.obj', function (object) {
-
-        // For any meshes in the model, add our material.
-        object.traverse(function (node) {
-
-            //if (node.isMesh)
-                node.material = material;
-
-        });
-        object.scale.set(0.01, 0.01, 0.01);
-        scene.add(object);
-    });
-*/    
-    
-    /*
-    objLoader.load('objects/solar_panel/solar_panel.obj', (root) => {
-        root.scale.set(.01, .01, .01);
-        root.position.y = 1;
-        scene.add(root);
-    });
-    */
-
-/*
-    var map = textureLoader.load('objects/solar_panel/solar_panel.jpg');
-    var material = new THREE.MeshPhongMaterial({map: map});
-
-    objLoader.load('objects/player/player.obj', function (object) {
-
-        // For any meshes in the model, add our material.
-        object.traverse(function (node) {
-
-            if (node.isMesh)
-                node.material = material;
-
-        });
-
-        scene.add(object);
-    });
-*/    
-    
     objLoader.load('objects/player/player.obj', (root) => {
         root.scale.set(.01, .01, .01);
         root.rotation.y = Math.PI * -1;
@@ -398,33 +320,35 @@ function resourceLoader()
     });
 }
 
-function loadObjWithTexture(obj_url, tex_url)
+function loadObjWithTexture(obj_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z)
 {
     const objLoader = new OBJLoader();
     var textureLoader = new THREE.TextureLoader();
-    
+
     var map = textureLoader.load(tex_url);
     var material = new THREE.MeshPhongMaterial({map: map});
 
     objLoader.load(obj_url, function (object) {
 
-        // For any meshes in the model, add our material.
-        object.traverse(function (node) {
+        if (tex_url != "") {
+            object.traverse(function (node) {
 
-            //if (node.isMesh)
+                //if (node.isMesh)
                 node.material = material;
 
-        });
-        object.scale.set(0.01, 0.01, 0.01);
+            });
+        }
+        object.position.set(p_x, p_y, p_z);
+        object.scale.set(s_x, s_y, s_z);
         scene.add(object);
     });
 }
 
-function loadFbxWithTexture(fbx_url, tex_url)
+function loadFbxWithTexture(fbx_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z)
 {
     const fbxLoader = new FBXLoader();
     var textureLoader = new THREE.TextureLoader();
-    
+
     var map = textureLoader.load(tex_url);
     var material = new THREE.MeshPhongMaterial({map: map});
 
@@ -434,10 +358,26 @@ function loadFbxWithTexture(fbx_url, tex_url)
         object.traverse(function (node) {
 
             //if (node.isMesh)
-                node.material = material;
+            node.material = material;
 
         });
-        object.scale.set(0.01, 0.01, 0.01);
+        object.position.set(p_x, p_y, p_z);
+        object.scale.set(s_x, s_y, s_z);
         scene.add(object);
+    });
+}
+
+function loadObjWithMtl(obj_url, mtl_url, p_x, p_y, p_z, s_x, s_y, s_z)
+{
+    const mtlLoader = new MTLLoader();
+    mtlLoader.load(mtl_url, function (materials) {
+        materials.preload();
+        const objLoaderExample = new OBJLoader();
+        objLoaderExample.setMaterials(materials);
+        objLoaderExample.load(obj_url, (root) => {
+            root.position.set(p_x, p_y, p_z);
+            root.scale.set(s_x, s_y, s_z);
+            scene.add(root);
+        });
     });
 }
