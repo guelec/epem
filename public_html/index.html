@@ -1,6 +1,7 @@
 <html>
 <head>
 	<title>EPEM</title>
+        <link rel="stylesheet" href="style.css">
 	<script src="http://threejs.org/build/three.js"></script>
 	<script src="PlayerControls.js"></script>
         
@@ -15,6 +16,34 @@ body
 <body>
 
 	<div id='container'></div>
+        
+        <div class="control-information-box">
+		<div>
+			<div id="control-information-box-wrapper">
+				<h2 class="box-header">Controls</h2>
+				<ul class="information-nav">
+					
+					<li><b>W:</b>Move forwards</li>
+					<li><b>A:</b>Turn Left</li>
+					<li><b>D:</b>Turn right</li>
+					<li><b>S:</b>Move backwards</li>
+					<li><b>Q:</b>Strafe Left</li>
+					<li><b>E:</b>Strafe Right</li>
+					<li><b>Space:</b>Jump</li>
+					<br>
+					<li><b>B:</b>Translate Object</li>
+					<li><b>N:</b>Rotate Object</li>
+					<li><b>M:</b>Scale Object</li>
+                                        <li><b>L:</b>Spotlight ON/OFF</li>
+                                        <li><b>V:</b>Change Shader</li>
+				</ul>
+			</div>
+		</div>
+	
+		
+	</div>
+        
+        
 	<script type = "module" src="main.js"></script>
 </body>
 </html>

@@ -1,0 +1,23 @@
+.control-information-box{
+    position: absolute;
+    background-color: rgba(255,255,255,0.8);
+}
+.box-header{
+    text-align: center;
+}
+.information-nav{
+    list-style-type: none;
+}
+
+#toggle-information-nav{
+    font-style: italic;
+    color: rgb(143, 35, 35);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+#control-information-box-wrapper{
+    overflow: hidden;
+    transition: all 1s ease-out;
+    max-height: 70vh;
+}

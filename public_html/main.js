@@ -8,12 +8,13 @@ import {DragControls} from './resources/threejs/r122/examples/jsm/controls/DragC
 var container, scene, camera, renderer;
 
 var t_control;      // Transform Control
-var t_control_1;
-var t_control_2;
 var controls;
 
 var drag_controls;
 var group;
+
+var spotLight;
+var shadeType = "Lambert";
 
 let enableSelection = false;
 const objects = [];
@@ -85,16 +86,34 @@ function init() {
         scene.add(light.target);
     }
 
+    {
+        spotLight = new THREE.SpotLight(0xffffff, 1);
+        spotLight.position.set(0, 0, 0);
+        spotLight.angle = Math.PI / 30;
+        spotLight.penumbra = 0.1;
+        spotLight.decay = 2;
+        spotLight.distance = 200;
+        spotLight.castShadow = true;
+        spotLight.shadow.mapSize.width = 50;
+        spotLight.shadow.mapSize.height = 50;
+        spotLight.shadow.camera.near = 10;
+        spotLight.shadow.camera.far = 200;
+        spotLight.shadow.focus = 2;
+
+        scene.add(spotLight);
+
+    }
+
     /////////////
 
-    resourceLoader();
-
+    resourceLoaderLambert();
+    playerLoader();
     /////////////
     ////
     ////
     //
     // Create a material
-
+    spotlightLoader();
 
 
     //
@@ -179,31 +198,38 @@ function init() {
             console.log(check);
             if (check == "Plan" || check == "Cyli")
             {
+                alert("Solar Panel\nEfficiency : 20\nCost:30");
+                spotLight.target = solar_panel;
                 t_control.position.set(solar_panel.position.x - 7, solar_panel.position.y, solar_panel.position.z);
                 t_control.attach(solar_panel);
             }
             if (check == "wind")
             {
+                spotLight.target = wind_mill;
                 t_control.position.set(wind_mill.position.x, wind_mill.position.y, wind_mill.position.z);
                 t_control.attach(wind_mill);
             }
             if (check == "chim")
             {
+                spotLight.target = biomass;
                 t_control.position.set(biomass.position.x + 3, biomass.position.y, biomass.position.z);
                 t_control.attach(biomass);
             }
             if (check == "Grou")
             {
+                spotLight.target = hydro;
                 t_control.position.set(hydro.position.x + 8, hydro.position.y, hydro.position.z);
                 t_control.attach(hydro);
             }
             if (check == "pipe")
             {
+                spotLight.target = natural_gas;
                 t_control.position.set(natural_gas.position.x + 13, natural_gas.position.y, natural_gas.position.z);
                 t_control.attach(natural_gas);
             }
             if (check == "Rock")
             {
+                spotLight.target = coal;
                 t_control.position.set(coal.position.x - 3, coal.position.y, coal.position.z);
                 t_control.attach(coal);
             }
@@ -236,47 +262,13 @@ function init() {
 }
 
 function animate() {
-    //raycaster.set(player.position, new THREE.Vector3(0, 0, 1));
-    //console.log(player.position);
-    //const intersects = raycaster.intersectObjects(scene.children, true);
 
-
-
-
-
-    /*if(intersects.length > 0){
-     for(let i = 0; i< intersects.length; i++){
-     if(intersects[i].distance < 0.5){
-     console.log("we hit something");
-     break;
-     }
-     else{
-     //console.log("object is far away")
-     };
-     }
-     
-     //intersects[0].object.material.color.set( 0xff0000 );
-     }
-     else{
-     console.log("no collision")
-     }*/
-
-    //console.log(intersects.length);
-    //controls.update();
     requestAnimationFrame(animate);
     render();
 
 }
 
 function render() {
-    // Render Scene
-    /*
-     if ( drag_controls.enabled )
-     controls.enabled = false;
-     else
-     controls.enabled = true;
-     
-     */
 
     renderer.clear();
     controls.update();
@@ -291,38 +283,46 @@ function onWindowResize() {
 
 }
 
-function objectLoader(mtlUrl, objUrl, x, z, y = 0.0, draggable = false, rotation = - 1) {
-
-    //if we wanna use obj outside and they aren't static, we can add it to a list or smth.
-
-    const mtlLoader = new MTLLoader();
-    mtlLoader.load(mtlUrl, function (materials) {
-        materials.preload();
-        const objLoaderExample = new OBJLoader();
-        objLoaderExample.setMaterials(materials);
-        objLoaderExample.load(objUrl, (root) => {
-
-            root.rotation.y = Math.PI * rotation;
-
-            root.position.x = x;
-            root.position.y = y;
-            root.position.z = z;
-            collidableObjects.push(root);
-            if (draggable)
-                objects.push(root);
-            scene.add(root);
-        });
-    });
-
-}
-
+document.addEventListener('keyup', function (event) {
+   switch (event.keyCode)
+   {
+       case 86:
+       {
+           if (shadeType == "Lambert")
+               shadeType = "Toon";
+           else
+               shadeType = "Lambert";
+       }
+   }
+});
 
 document.addEventListener('keydown', function (event) {
 
     // add to collect datas
     switch (event.keyCode)
     {
+        case 88: // X
+            control_target = camera;
+            break;
+        case 86: // V
+        {
+            if (shadeType == "Lambert")
+                resourceLoaderToon();           
+            if (shadeType == "Toon")
+                resourceLoaderLambert();
+            break;     
+        }
+        case 76: // L
+        {
+            console.log("L");
+            if (spotLight.intensity === 1)
+                spotLight.intensity = 0;
+            else if (spotLight.intensity === 0)
+                spotLight.intensity = 1;
+            break;
+        }
         case 66: // B
+            console.log("B")
             t_control.setMode("translate");
             break;
 
@@ -335,27 +335,6 @@ document.addEventListener('keydown', function (event) {
             break;
     }
 
-    /*
-     if (event.keyCode == 70) {
-     if (control_target == player)
-     {
-     control_target = truck;
-     player.visible = false;
-     player.position.x = truck.position.x;
-     player.position.y = truck.position.y;
-     player.position.z = truck.position.z;
-     } else
-     {
-     control_target = player;
-     player.visible = true;
-     player.position.x = truck.position.x - 10;
-     player.position.y = truck.position.y;
-     player.position.z = truck.position.z;
-     }
-     
-     controls = new THREE.PlayerControls(camera, control_target);
-     }
-     */
 }, true);
 
 
@@ -415,41 +394,47 @@ function onClick(event) {
 
 }
 
-function resourceLoader()
+function resourceLoaderToon()
 {
-    loadObjWithTexture('objects/solar_panel/solar_panel.obj', 'objects/solar_panel/solar_panel.jpg'
+    loadObjWithTextureToon('objects/solar_panel/solar_panel.obj', 'objects/solar_panel/solar_panel.jpg'
             , -4, 0.5, 0, 0.005, 0.005, 0.005, solar_panel);
-    loadObjWithTexture('objects/biomass/biomass.obj', 'objects/biomass/biomass.jpg'
+    loadObjWithTextureToon('objects/biomass/biomass.obj', 'objects/biomass/biomass.jpg'
             , 0, 0, 0, 0.005, 0.001, 0.005, biomass);
     loadObjWithMtl('objects/hydro/hydro.obj', 'objects/hydro/hydro.mtl'
             , 8, 0, 0, 0.005, 0.005, 0.005, hydro);
-    loadObjWithTexture('objects/natural_gas/natural_gas.obj', 'objects/natural_gas/natural_gas.png'
+    loadObjWithTextureToon('objects/natural_gas/natural_gas.obj', 'objects/natural_gas/natural_gas.png'
             , 13, 0.25, 0, 0.5, 0.5, 0.5, natural_gas);
-    loadObjWithTexture('objects/coal/coal.obj', 'objects/coal/coal.jpg'
+    loadObjWithTextureToon('objects/coal/coal.obj', 'objects/coal/coal.jpg'
             , -2, 0, 0, 0.2, 0.2, 0.2, coal);
-    loadFbxWithTexture('objects/wind_mill/wind_mill.fbx', 'objects/solar_panel/solar_panel.jpg'
+    loadFbxWithTextureToon('objects/wind_mill/wind_mill.fbx', 'objects/solar_panel/solar_panel.jpg'
             , 0, 2, 0, 0.001, 0.001, 0.001, wind_mill);
-
-    const fbxLoader = new FBXLoader();
-    const objLoader = new OBJLoader();
-
-
-    objLoader.load('objects/player/player.obj', (root) => {
-        root.scale.set(.01, .01, .01);
-        root.rotation.y = Math.PI * -1;
-        player.position.z = 5;
-        player.add(root);
-        //scene.add(root);
-    });
+    
 }
 
-function loadObjWithTexture(obj_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z, obj)
+function resourceLoaderLambert()
+{
+    loadObjWithTextureLambert('objects/solar_panel/solar_panel.obj', 'objects/solar_panel/solar_panel.jpg'
+            , -4, 0.5, 0, 0.005, 0.005, 0.005, solar_panel);
+    loadObjWithTextureLambert('objects/biomass/biomass.obj', 'objects/biomass/biomass.jpg'
+            , 0, 0, 0, 0.005, 0.001, 0.005, biomass);
+    loadObjWithMtl('objects/hydro/hydro.obj', 'objects/hydro/hydro.mtl'
+            , 8, 0, 0, 0.005, 0.005, 0.005, hydro);
+    loadObjWithTextureLambert('objects/natural_gas/natural_gas.obj', 'objects/natural_gas/natural_gas.png'
+            , 13, 0.25, 0, 0.5, 0.5, 0.5, natural_gas);
+    loadObjWithTextureLambert('objects/coal/coal.obj', 'objects/coal/coal.jpg'
+            , -2, 0, 0, 0.2, 0.2, 0.2, coal);
+    loadFbxWithTextureLambert('objects/wind_mill/wind_mill.fbx', 'objects/solar_panel/solar_panel.jpg'
+            , 0, 2, 0, 0.001, 0.001, 0.001, wind_mill);
+    
+}
+
+function loadObjWithTextureToon(obj_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z, obj)
 {
     const objLoader = new OBJLoader();
     var textureLoader = new THREE.TextureLoader();
 
     var map = textureLoader.load(tex_url);
-    var material = new THREE.MeshPhongMaterial({map: map});
+    var material = new THREE.MeshToonMaterial({map: map});
 
     objLoader.load(obj_url, function (object) {
 
@@ -469,13 +454,13 @@ function loadObjWithTexture(obj_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z, obj)
     });
 }
 
-function loadFbxWithTexture(fbx_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z, obj)
+function loadFbxWithTextureToon(fbx_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z, obj)
 {
     const fbxLoader = new FBXLoader();
     var textureLoader = new THREE.TextureLoader();
 
     var map = textureLoader.load(tex_url);
-    var material = new THREE.MeshPhongMaterial({map: map});
+    var material = new THREE.MeshToonMaterial({map: map});
 
     fbxLoader.load(fbx_url, function (object) {
 
@@ -511,44 +496,70 @@ function loadObjWithMtl(obj_url, mtl_url, p_x, p_y, p_z, s_x, s_y, s_z, obj)
     });
 }
 
-/*
- function click(ev) {
- 
- console.log("click");
- 
- var transformControls = scene.getObjectByName("transformControls", true);
- var objControlled = scene.getObjectByName("objControlled", true);
- 
- if (transformControls === undefined || transformControls === null) {
- transformControls = new THREE.TransformControls(camera, renderer.domElement);
- transformControls.addEventListener('change', render);
- transformControls.name = "transformControls";
- 
- scene.add(transformControls);
- 
- }
- 
- if (objControlled === undefined || objControlled === null) {
- 
- try {
- transformControls.attach(ev.data.target);
- ev.data.target.name = "objControlled";
- } catch (err) {
- console.log(err);
- }
- 
- } else {
- 
- try {
- transformControls.detach(objControlled);
- objControlled.name = "oldControlled";
- 
- transformControls.attach(ev.data.target);
- ev.data.target.name = "objControlled";
- } catch (err) {
- console.log(err);
- }
- }
- }
- * 
- */
+function loadObjWithTextureLambert(obj_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z, obj)
+{
+    const objLoader = new OBJLoader();
+    var textureLoader = new THREE.TextureLoader();
+
+    var map = textureLoader.load(tex_url);
+    var material = new THREE.MeshLambertMaterial({map: map});
+
+    objLoader.load(obj_url, function (object) {
+
+        if (tex_url != "") {
+            object.traverse(function (node) {
+
+                //if (node.isMesh)
+                node.material = material;
+
+            });
+        }
+        object.position.set(p_x, p_y, p_z);
+        object.scale.set(s_x, s_y, s_z);
+        objects.push(object);
+        obj.add(object);
+//        scene.add(object);
+    });
+}
+
+function loadFbxWithTextureLambert(fbx_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z, obj)
+{
+    const fbxLoader = new FBXLoader();
+    var textureLoader = new THREE.TextureLoader();
+
+    var map = textureLoader.load(tex_url);
+    var material = new THREE.MeshLambertMaterial({map: map});
+
+    fbxLoader.load(fbx_url, function (object) {
+
+        // For any meshes in the model, add our material.
+        object.traverse(function (node) {
+
+            //if (node.isMesh)
+            node.material = material;
+
+        });
+        object.position.set(p_x, p_y, p_z);
+        object.scale.set(s_x, s_y, s_z);
+        objects.push(object);
+        obj.add(object);
+//        scene.add(object);
+    });
+}
+
+function playerLoader()
+{
+    var objLoader = new OBJLoader();
+    objLoader.load('objects/player/player.obj', (root) => {
+        root.scale.set(.01, .01, .01);
+        root.rotation.y = Math.PI * -1;
+        player.position.z = 5;
+        player.add(root);
+        //scene.add(root);
+    });
+}
+
+function spotlightLoader()
+{
+
+}
