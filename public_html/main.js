@@ -7,18 +7,23 @@ import {DragControls} from './resources/threejs/r122/examples/jsm/controls/DragC
 
 var container, scene, camera, renderer;
 
+var t_control;      // Transform Control
+var t_control_1;
+var t_control_2;
 var controls;
+
 var drag_controls;
 var group;
 
-var sphere;
 let enableSelection = false;
 const objects = [];
 const collidableObjects = [];
 var collected = [];
 
 var player = new THREE.Object3D();
+player.name = "player";
 var solar_panel = new THREE.Object3D();
+solar_panel.name = "solar_panel";
 var wind_mill = new THREE.Object3D();
 var natural_gas = new THREE.Object3D();
 var hydro = new THREE.Object3D();
@@ -35,7 +40,7 @@ function init() {
     // Setup
     container = document.getElementById('container');
     scene = new THREE.Scene();
-
+    scene.add(new THREE.AxesHelper(10));
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
 
     renderer = new THREE.WebGLRenderer({alpha: true});
@@ -83,7 +88,7 @@ function init() {
     /////////////
 
     resourceLoader();
-
+    
     /////////////
     ////
     ////
@@ -96,14 +101,132 @@ function init() {
     player.position.x = 0;
     //player.rotation.y += Math.PI * 0.5;
     scene.add(player);
-    
-    
+    scene.add(coal);
+    scene.add(natural_gas);
+    scene.add(biomass);
+    scene.add(hydro);
+    scene.add(wind_mill);
+    scene.add(solar_panel);
+
+    //coal.on('pointerdown', function (ev) {
+    //    console.log('pt down');
+    //});
+
+
+
 
     controls = new THREE.PlayerControls(camera, control_target, collidableObjects, raycaster);
     controls.init();
 
     group = new THREE.Group();
     scene.add(group);
+
+    //
+    var arr = [solar_panel, wind_mill, biomass, natural_gas, coal, hydro];
+    /*
+     const transformControls1 = new TransformControls(
+     camera,
+     renderer.domElement,
+     );
+     transformControls1.addEventListener('change', () => renderer.render(scene, camera));
+     transformControls1.setSpace('local');
+     scene.add(transformControls1);
+     transformControls1.attach(solar_panel);
+     
+     const transformControls2 = new TransformControls(
+     camera,
+     renderer.domElement,
+     );
+     transformControls2.addEventListener('change', () => renderer.render(scene, camera));
+     transformControls2.setSpace('local');
+     scene.add(transformControls2);
+     transformControls2.attach(natural_gas);
+     */
+
+
+    
+     {
+     t_control = new TransformControls(camera, renderer.domElement);
+     t_control.addEventListener('change', render);
+     
+     t_control.addEventListener('dragging-changed', function (event) {
+     
+     controls.enabled = !event.value;
+     
+     });
+     scene.add(t_control);
+     
+     
+     }
+     /*
+     {
+     t_control_1 = new TransformControls(camera, renderer.domElement);
+     t_control_1.addEventListener('change', render);
+     
+     t_control_1.addEventListener('dragging-changed', function (event) {
+     
+     controls.enabled = !event.value;
+     
+     });
+     scene.add(t_control_1);
+     t_control_1.attach(arr[1]);
+     
+     }
+     */
+    /*
+     t_control.attach(solar_panel);
+     t_control.attach(wind_mill);
+     t_control.attach(biomass);
+     t_control.attach(natural_gas);
+     t_control.attach(coal);
+     t_control.attach(hydro);
+     */
+    // scene.add(t_control);
+    //
+
+    //  onClick Part
+    container.addEventListener('click', function (event) {
+        var bounds = container.getBoundingClientRect();
+        mouse.x = ((event.clientX - bounds.left) / container.clientWidth) * 2 - 1;
+        mouse.y = -((event.clientY - bounds.top) / container.clientHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        var intersects = raycaster.intersectObjects(scene.children, true);
+        if (intersects.length > 0) {
+            //console.log(intersects[0].object.name);
+            var objName = intersects[0].object.name;
+            var check = objName[0] + objName[1] + objName[2] + objName[3];
+            console.log(check);
+            if (check == "Plan" || check == "Cyli")
+            {
+                t_control.position.set(solar_panel.position.x - 3, solar_panel.position.y, solar_panel.position.z);
+                t_control.attach(solar_panel);
+            }
+            if (check == "wind")
+            {
+                t_control.attach(wind_mill);
+            }
+            if (check == "chim")
+            {
+                t_control.attach(biomass);
+            }
+            if (check == "Grou")
+            {
+                t_control.attach(hydro);
+            }
+            if (check == "pipe")
+            {
+                t_control.attach(natural_gas);
+            }
+            if (check == "Rock")
+            {
+                t_control.attach(coal);
+            }
+
+        }
+    }, false);
+    //
+
+
 
     drag_controls = new DragControls(objects, camera, renderer.domElement);
     controls.addEventListener('drag', render);
@@ -296,17 +419,17 @@ function onClick(event) {
 function resourceLoader()
 {
     loadObjWithTexture('objects/solar_panel/solar_panel.obj', 'objects/solar_panel/solar_panel.jpg'
-            , 0, 0.5, 0, 0.005, 0.005, 0.005);
+            , -5, 0.5, 0, 0.005, 0.005, 0.005, solar_panel);
     loadObjWithTexture('objects/biomass/biomass.obj', 'objects/biomass/biomass.jpg'
-            , 0, 0, 0, 0.005, 0.001, 0.005);
+            , 0, 0, 0, 0.005, 0.001, 0.005, biomass);
     loadObjWithMtl('objects/hydro/hydro.obj', 'objects/hydro/hydro.mtl'
-            , 5, 0, 0, 0.005, 0.005, 0.005);
+            , 5, 0, 0, 0.005, 0.005, 0.005, hydro);
     loadObjWithTexture('objects/natural_gas/natural_gas.obj', 'objects/natural_gas/natural_gas.png'
-            , 10, 0.25, 0, 0.5, 0.5, 0.5);
+            , 10, 0.25, 0, 0.5, 0.5, 0.5, natural_gas);
     loadObjWithTexture('objects/coal/coal.obj', 'objects/coal/coal.jpg'
-            , 0, 0, 0, 0.2, 0.2, 0.2);
+            , -2, 0, 0, 0.2, 0.2, 0.2, coal);
     loadFbxWithTexture('objects/wind_mill/wind_mill.fbx', 'objects/solar_panel/solar_panel.jpg'
-            , 0, 2, 0, 0.001, 0.001, 0.001);
+            , 0, 2, 0, 0.001, 0.001, 0.001, wind_mill);
 
     const fbxLoader = new FBXLoader();
     const objLoader = new OBJLoader();
@@ -315,12 +438,13 @@ function resourceLoader()
     objLoader.load('objects/player/player.obj', (root) => {
         root.scale.set(.01, .01, .01);
         root.rotation.y = Math.PI * -1;
+        player.position.z = 5;
         player.add(root);
         //scene.add(root);
     });
 }
 
-function loadObjWithTexture(obj_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z)
+function loadObjWithTexture(obj_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z, obj)
 {
     const objLoader = new OBJLoader();
     var textureLoader = new THREE.TextureLoader();
@@ -340,11 +464,13 @@ function loadObjWithTexture(obj_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z)
         }
         object.position.set(p_x, p_y, p_z);
         object.scale.set(s_x, s_y, s_z);
-        scene.add(object);
+        objects.push(object);
+        obj.add(object);
+//        scene.add(object);
     });
 }
 
-function loadFbxWithTexture(fbx_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z)
+function loadFbxWithTexture(fbx_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z, obj)
 {
     const fbxLoader = new FBXLoader();
     var textureLoader = new THREE.TextureLoader();
@@ -363,11 +489,13 @@ function loadFbxWithTexture(fbx_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z)
         });
         object.position.set(p_x, p_y, p_z);
         object.scale.set(s_x, s_y, s_z);
-        scene.add(object);
+        objects.push(object);
+        obj.add(object);
+//        scene.add(object);
     });
 }
 
-function loadObjWithMtl(obj_url, mtl_url, p_x, p_y, p_z, s_x, s_y, s_z)
+function loadObjWithMtl(obj_url, mtl_url, p_x, p_y, p_z, s_x, s_y, s_z, obj)
 {
     const mtlLoader = new MTLLoader();
     mtlLoader.load(mtl_url, function (materials) {
@@ -377,7 +505,51 @@ function loadObjWithMtl(obj_url, mtl_url, p_x, p_y, p_z, s_x, s_y, s_z)
         objLoaderExample.load(obj_url, (root) => {
             root.position.set(p_x, p_y, p_z);
             root.scale.set(s_x, s_y, s_z);
-            scene.add(root);
+            objects.push(root);
+            obj.add(root);
+//            scene.add(root);
         });
     });
 }
+
+/*
+ function click(ev) {
+ 
+ console.log("click");
+ 
+ var transformControls = scene.getObjectByName("transformControls", true);
+ var objControlled = scene.getObjectByName("objControlled", true);
+ 
+ if (transformControls === undefined || transformControls === null) {
+ transformControls = new THREE.TransformControls(camera, renderer.domElement);
+ transformControls.addEventListener('change', render);
+ transformControls.name = "transformControls";
+ 
+ scene.add(transformControls);
+ 
+ }
+ 
+ if (objControlled === undefined || objControlled === null) {
+ 
+ try {
+ transformControls.attach(ev.data.target);
+ ev.data.target.name = "objControlled";
+ } catch (err) {
+ console.log(err);
+ }
+ 
+ } else {
+ 
+ try {
+ transformControls.detach(objControlled);
+ objControlled.name = "oldControlled";
+ 
+ transformControls.attach(ev.data.target);
+ ev.data.target.name = "objControlled";
+ } catch (err) {
+ console.log(err);
+ }
+ }
+ }
+ * 
+ */
