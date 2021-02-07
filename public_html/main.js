@@ -40,7 +40,7 @@ function init() {
     // Setup
     container = document.getElementById('container');
     scene = new THREE.Scene();
-    scene.add(new THREE.AxesHelper(10));
+
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
 
     renderer = new THREE.WebGLRenderer({alpha: true});
@@ -203,22 +203,27 @@ function init() {
             }
             if (check == "wind")
             {
+                t_control.position.set(wind_mill.position.x, wind_mill.position.y, wind_mill.position.z);
                 t_control.attach(wind_mill);
             }
             if (check == "chim")
             {
+                t_control.position.set(biomass.position.x + 3, biomass.position.y, biomass.position.z);
                 t_control.attach(biomass);
             }
             if (check == "Grou")
             {
+                t_control.position.set(hydro.position.x + 8, hydro.position.y, hydro.position.z);
                 t_control.attach(hydro);
             }
             if (check == "pipe")
             {
+                t_control.position.set(natural_gas.position.x, natural_gas.position.y, natural_gas.position.z);
                 t_control.attach(natural_gas);
             }
             if (check == "Rock")
             {
+                t_control.position.set(coal.position.x - 3, coal.position.y, coal.position.z);
                 t_control.attach(coal);
             }
 
@@ -419,13 +424,13 @@ function onClick(event) {
 function resourceLoader()
 {
     loadObjWithTexture('objects/solar_panel/solar_panel.obj', 'objects/solar_panel/solar_panel.jpg'
-            , -5, 0.5, 0, 0.005, 0.005, 0.005, solar_panel);
+            , -4, 0.5, 0, 0.005, 0.005, 0.005, solar_panel);
     loadObjWithTexture('objects/biomass/biomass.obj', 'objects/biomass/biomass.jpg'
             , 0, 0, 0, 0.005, 0.001, 0.005, biomass);
     loadObjWithMtl('objects/hydro/hydro.obj', 'objects/hydro/hydro.mtl'
-            , 5, 0, 0, 0.005, 0.005, 0.005, hydro);
+            , 8, 0, 0, 0.005, 0.005, 0.005, hydro);
     loadObjWithTexture('objects/natural_gas/natural_gas.obj', 'objects/natural_gas/natural_gas.png'
-            , 10, 0.25, 0, 0.5, 0.5, 0.5, natural_gas);
+            , 13, 0.25, 0, 0.5, 0.5, 0.5, natural_gas);
     loadObjWithTexture('objects/coal/coal.obj', 'objects/coal/coal.jpg'
             , -2, 0, 0, 0.2, 0.2, 0.2, coal);
     loadFbxWithTexture('objects/wind_mill/wind_mill.fbx', 'objects/solar_panel/solar_panel.jpg'
