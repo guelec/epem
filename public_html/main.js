@@ -520,6 +520,32 @@ function loadFbxWithTextureLambert(fbx_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_
 
 function playerLoader()
 {
+    const fbxLoader = new FBXLoader();
+    var textureLoader = new THREE.TextureLoader();
+
+    var map = textureLoader.load("robot.jpg");
+    var material = new THREE.MeshLambertMaterial({map: map});
+
+    fbxLoader.load("robot.fbx", function (object) {
+
+        // For any meshes in the model, add our material.
+        object.traverse(function (node) {
+
+            //if (node.isMesh)
+            node.material = material;
+
+        });
+        object.scale.set(.005, .005, .005);
+        object.rotation.y = Math.PI * -1;
+        player.position.z = 5;
+        player.add(object);
+//        scene.add(object);
+    });
+}
+
+/*
+function playerLoader()
+{
     var objLoader = new OBJLoader();
     objLoader.load('objects/player/player.obj', (root) => {
         root.scale.set(.01, .01, .01);
@@ -529,3 +555,5 @@ function playerLoader()
         //scene.add(root);
     });
 }
+* */
+
