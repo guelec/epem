@@ -25,7 +25,9 @@ var collected = [];
 var player = new THREE.Object3D();
 player.name = "player";
 var solar_panel = new THREE.Object3D();
-solar_panel.name = "solar_panel";
+solar_panel.eff = 30;
+solar_panel.cost = 14;
+solar_panel.emis = 40;
 var wind_mill = new THREE.Object3D();
 var natural_gas = new THREE.Object3D();
 var hydro = new THREE.Object3D();
@@ -38,7 +40,7 @@ init();
 animate();
 
 function init() {
-
+    
     // Setup
     container = document.getElementById('container');
     scene = new THREE.Scene();
@@ -203,37 +205,59 @@ function init() {
             console.log(check);
             if (check == "Plan" || check == "Cyli")
             {
-                alert("Solar Panel\nEfficiency : 20\nCost:30");
-                
+                swal("Solar Panel","A panel designed to absorb the sun's rays as a source of energy for generating electricity or heating.\n\
+Efficiency : 30%\n\
+Cost : 14 Units\n\
+CO2 Emission : 40 Units");
                 t_control.position.set(solar_panel.position.x - 7, solar_panel.position.y, solar_panel.position.z);
                 t_control.attach(solar_panel);
             }
             if (check == "wind")
             {
+                swal("Wind Turbine", "A wind turbine, or wind energy converter, is a device that converts the wind's kinetic energy into electrical energy.\n\
+Efficiency : 90%\n\
+Cost : 12 Units\n\
+CO2 Emission : 2 Units");
                 spotLight.target = wind_mill;
                 t_control.position.set(wind_mill.position.x, wind_mill.position.y, wind_mill.position.z);
                 t_control.attach(wind_mill);
             }
             if (check == "chim")
             {
+                swal("Biomass", "Biomass is plant or animal material used as fuel to produce electricity or heat.\n\
+Efficiency : 45%\n\
+Cost : 14 Units\n\
+CO2 Emission : 4 Units");
                 spotLight.target = biomass;
                 t_control.position.set(biomass.position.x + 3, biomass.position.y, biomass.position.z);
                 t_control.attach(biomass);
             }
             if (check == "Grou")
             {
+                swal("Hydroelectric Energy", "Hydroelectric energy, also called hydroelectric power or hydroelectricity, is a form of energy that harnesses the power of water in motion—such as water flowing over a waterfall—to generate electricity..\n\
+Efficiency : 60%\n\
+Cost : 10 Units\n\
+CO2 Emission : 2 Units");
                 spotLight.target = hydro;
                 t_control.position.set(hydro.position.x + 8, hydro.position.y, hydro.position.z);
                 t_control.attach(hydro);
             }
             if (check == "pipe")
             {
+                swal("Natural Gas", "Natural gas power plant is a thermal power station which burns natural gas to generate electricity. \n\
+Efficiency : 40%\n\
+Cost : 10 Units\n\
+CO2 Emission : 20 Units");
                 spotLight.target = natural_gas;
                 t_control.position.set(natural_gas.position.x + 13, natural_gas.position.y, natural_gas.position.z);
                 t_control.attach(natural_gas);
             }
             if (check == "Rock")
             {
+                swal("Coal", "Coal-fired plants produce electricity by burning coal in a boiler to produce steam. \n\
+Efficiency : 30%\n\
+Cost : 14 Units\n\
+CO2 Emission : 40 Units");
                 spotLight.target = coal;
                 t_control.position.set(coal.position.x - 3, coal.position.y, coal.position.z);
                 t_control.attach(coal);
