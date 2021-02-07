@@ -14,6 +14,7 @@ var drag_controls;
 var group;
 
 var spotLight;
+var spotLightTarget = new THREE.Object3D;
 var shadeType = "Lambert";
 
 let enableSelection = false;
@@ -78,7 +79,7 @@ function init() {
 
     {
         const color = 0xFFFFFF;
-        const intensity = 1;
+        const intensity = 0.5;
         const light = new THREE.DirectionalLight(color, intensity);
         light.position.set(0, 10, 0);
         light.target.position.set(-5, 0, 0);
@@ -87,21 +88,25 @@ function init() {
     }
 
     {
-        spotLight = new THREE.SpotLight(0xffffff, 1);
+        spotLight = new THREE.SpotLight(0xffffff, 0);
         spotLight.position.set(0, 0, 0);
         spotLight.angle = Math.PI / 30;
         spotLight.penumbra = 0.1;
         spotLight.decay = 2;
-        spotLight.distance = 200;
+        spotLight.distance = 600;
         spotLight.castShadow = true;
         spotLight.shadow.mapSize.width = 50;
         spotLight.shadow.mapSize.height = 50;
         spotLight.shadow.camera.near = 10;
         spotLight.shadow.camera.far = 200;
         spotLight.shadow.focus = 2;
-
         scene.add(spotLight);
 
+        var targetObject = spotLightTarget;
+        scene.add(targetObject);
+        
+        targetObject = solar_panel;
+        spotLight.target = targetObject;
     }
 
     /////////////
@@ -199,7 +204,7 @@ function init() {
             if (check == "Plan" || check == "Cyli")
             {
                 alert("Solar Panel\nEfficiency : 20\nCost:30");
-                spotLight.target = solar_panel;
+                
                 t_control.position.set(solar_panel.position.x - 7, solar_panel.position.y, solar_panel.position.z);
                 t_control.attach(solar_panel);
             }
@@ -270,6 +275,8 @@ function animate() {
 
 function render() {
 
+    spotLight.position.set(solar_panel.position.x, solar_panel.position.y + 150, solar_panel.position.z);
+    spotLight.target = spotLightTarget;
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
@@ -301,9 +308,6 @@ document.addEventListener('keydown', function (event) {
     // add to collect datas
     switch (event.keyCode)
     {
-        case 88: // X
-            control_target = camera;
-            break;
         case 86: // V
         {
             if (shadeType == "Lambert")
