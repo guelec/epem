@@ -47,7 +47,7 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     //
     {
-        const planeSize = 2000;
+        const planeSize = 40;
 
         const loader = new THREE.TextureLoader();
         const texture = loader.load('ground_6.jpg');
@@ -88,7 +88,7 @@ function init() {
     /////////////
 
     resourceLoader();
-    
+
     /////////////
     ////
     ////
@@ -122,43 +122,24 @@ function init() {
     scene.add(group);
 
     //
-    var arr = [solar_panel, wind_mill, biomass, natural_gas, coal, hydro];
+
+
+
+
+    {
+        t_control = new TransformControls(camera, renderer.domElement);
+        t_control.addEventListener('change', render);
+
+        t_control.addEventListener('dragging-changed', function (event) {
+
+            controls.enabled = !event.value;
+
+        });
+        scene.add(t_control);
+
+
+    }
     /*
-     const transformControls1 = new TransformControls(
-     camera,
-     renderer.domElement,
-     );
-     transformControls1.addEventListener('change', () => renderer.render(scene, camera));
-     transformControls1.setSpace('local');
-     scene.add(transformControls1);
-     transformControls1.attach(solar_panel);
-     
-     const transformControls2 = new TransformControls(
-     camera,
-     renderer.domElement,
-     );
-     transformControls2.addEventListener('change', () => renderer.render(scene, camera));
-     transformControls2.setSpace('local');
-     scene.add(transformControls2);
-     transformControls2.attach(natural_gas);
-     */
-
-
-    
-     {
-     t_control = new TransformControls(camera, renderer.domElement);
-     t_control.addEventListener('change', render);
-     
-     t_control.addEventListener('dragging-changed', function (event) {
-     
-     controls.enabled = !event.value;
-     
-     });
-     scene.add(t_control);
-     
-     
-     }
-     /*
      {
      t_control_1 = new TransformControls(camera, renderer.domElement);
      t_control_1.addEventListener('change', render);
@@ -198,7 +179,7 @@ function init() {
             console.log(check);
             if (check == "Plan" || check == "Cyli")
             {
-                t_control.position.set(solar_panel.position.x - 3, solar_panel.position.y, solar_panel.position.z);
+                t_control.position.set(solar_panel.position.x - 7, solar_panel.position.y, solar_panel.position.z);
                 t_control.attach(solar_panel);
             }
             if (check == "wind")
@@ -218,7 +199,7 @@ function init() {
             }
             if (check == "pipe")
             {
-                t_control.position.set(natural_gas.position.x, natural_gas.position.y, natural_gas.position.z);
+                t_control.position.set(natural_gas.position.x + 13, natural_gas.position.y, natural_gas.position.z);
                 t_control.attach(natural_gas);
             }
             if (check == "Rock")
@@ -339,7 +320,20 @@ function objectLoader(mtlUrl, objUrl, x, z, y = 0.0, draggable = false, rotation
 document.addEventListener('keydown', function (event) {
 
     // add to collect datas
+    switch (event.keyCode)
+    {
+        case 66: // B
+            t_control.setMode("translate");
+            break;
 
+        case 78: // N
+            t_control.setMode("rotate");
+            break;
+
+        case 77: // M
+            t_control.setMode("scale");
+            break;
+    }
 
     /*
      if (event.keyCode == 70) {
