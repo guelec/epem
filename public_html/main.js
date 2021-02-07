@@ -12,6 +12,7 @@ var controls;
 
 var drag_controls;
 var group;
+var range;
 
 var spotLight;
 var spotLightTarget = new THREE.Object3D;
@@ -40,7 +41,7 @@ init();
 animate();
 
 function init() {
-    
+
     // Setup
     container = document.getElementById('container');
     scene = new THREE.Scene();
@@ -106,26 +107,15 @@ function init() {
 
         var targetObject = spotLightTarget;
         scene.add(targetObject);
-        
+
         targetObject = solar_panel;
         spotLight.target = targetObject;
     }
 
-    /////////////
-
     resourceLoaderLambert();
     playerLoader();
-    /////////////
-    ////
-    ////
-    //
-    // Create a material
-    spotlightLoader();
 
-
-    //
     player.position.x = 0;
-    //player.rotation.y += Math.PI * 0.5;
     scene.add(player);
     scene.add(coal);
     scene.add(natural_gas);
@@ -134,23 +124,11 @@ function init() {
     scene.add(wind_mill);
     scene.add(solar_panel);
 
-    //coal.on('pointerdown', function (ev) {
-    //    console.log('pt down');
-    //});
-
-
-
-
     controls = new THREE.PlayerControls(camera, control_target, collidableObjects, raycaster);
     controls.init();
 
     group = new THREE.Group();
     scene.add(group);
-
-    //
-
-
-
 
     {
         t_control = new TransformControls(camera, renderer.domElement);
@@ -165,31 +143,6 @@ function init() {
 
 
     }
-    /*
-     {
-     t_control_1 = new TransformControls(camera, renderer.domElement);
-     t_control_1.addEventListener('change', render);
-     
-     t_control_1.addEventListener('dragging-changed', function (event) {
-     
-     controls.enabled = !event.value;
-     
-     });
-     scene.add(t_control_1);
-     t_control_1.attach(arr[1]);
-     
-     }
-     */
-    /*
-     t_control.attach(solar_panel);
-     t_control.attach(wind_mill);
-     t_control.attach(biomass);
-     t_control.attach(natural_gas);
-     t_control.attach(coal);
-     t_control.attach(hydro);
-     */
-    // scene.add(t_control);
-    //
 
     //  onClick Part
     container.addEventListener('click', function (event) {
@@ -205,7 +158,7 @@ function init() {
             console.log(check);
             if (check == "Plan" || check == "Cyli")
             {
-                swal("Solar Panel","A panel designed to absorb the sun's rays as a source of energy for generating electricity or heating.\n\
+                swal("Solar Panel", "A panel designed to absorb the sun's rays as a source of energy for generating electricity or heating.\n\
 Efficiency : 30%\n\
 Cost : 14 Units\n\
 CO2 Emission : 40 Units");
@@ -265,29 +218,13 @@ CO2 Emission : 40 Units");
 
         }
     }, false);
-    //
-
-
-
     drag_controls = new DragControls(objects, camera, renderer.domElement);
     controls.addEventListener('drag', render);
-
-    // Events
     controls.addEventListener('change', render, false);
     window.addEventListener('resize', onWindowResize, false);
-
-    // Final touches
     container.appendChild(renderer.domElement);
     document.body.appendChild(container);
-
-    // Drag Control
     document.addEventListener('oncontextmenu', onClick, false);
-    //document.addEventListener('onmouseup', onRelease, false);
-
-    // SPOTLIGHT
-
-
-
 }
 
 function animate() {
@@ -315,16 +252,16 @@ function onWindowResize() {
 }
 
 document.addEventListener('keyup', function (event) {
-   switch (event.keyCode)
-   {
-       case 86:
-       {
-           if (shadeType == "Lambert")
-               shadeType = "Toon";
-           else
-               shadeType = "Lambert";
-       }
-   }
+    switch (event.keyCode)
+    {
+        case 86:
+        {
+            if (shadeType == "Lambert")
+                shadeType = "Toon";
+            else
+                shadeType = "Lambert";
+        }
+    }
 });
 
 document.addEventListener('keydown', function (event) {
@@ -332,13 +269,19 @@ document.addEventListener('keydown', function (event) {
     // add to collect datas
     switch (event.keyCode)
     {
+        case 71: // G
+            findBestOption(30);
+            break;
+        case 72: // H
+            findBestOption(60);
+            break;
         case 86: // V
         {
             if (shadeType == "Lambert")
-                resourceLoaderToon();           
+                resourceLoaderToon();
             if (shadeType == "Toon")
                 resourceLoaderLambert();
-            break;     
+            break;
         }
         case 76: // L
         {
@@ -436,7 +379,7 @@ function resourceLoaderToon()
             , -2, 0, 0, 0.2, 0.2, 0.2, coal);
     loadFbxWithTextureToon('objects/wind_mill/wind_mill.fbx', 'objects/solar_panel/solar_panel.jpg'
             , 0, 2, 0, 0.001, 0.001, 0.001, wind_mill);
-    
+
 }
 
 function resourceLoaderLambert()
@@ -453,7 +396,7 @@ function resourceLoaderLambert()
             , -2, 0, 0, 0.2, 0.2, 0.2, coal);
     loadFbxWithTextureLambert('objects/wind_mill/wind_mill.fbx', 'objects/solar_panel/solar_panel.jpg'
             , 0, 2, 0, 0.001, 0.001, 0.001, wind_mill);
-    
+
 }
 
 function loadObjWithTextureToon(obj_url, tex_url, p_x, p_y, p_z, s_x, s_y, s_z, obj)
@@ -585,9 +528,4 @@ function playerLoader()
         player.add(root);
         //scene.add(root);
     });
-}
-
-function spotlightLoader()
-{
-
 }
